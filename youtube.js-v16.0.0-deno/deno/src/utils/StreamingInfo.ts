@@ -577,7 +577,7 @@ async function getVideoRepresentation(
     bitrate: format.bitrate,
     width: format.width,
     height: format.height,
-    codecs: !hoisted.includes('codecs') ? getStringBetweenStrings(format.mime_type, 'codecs="', '"') : undefined,
+    codecs: getStringBetweenStrings(format.mime_type, 'codecs="', '"'),
     fps: !hoisted.includes('fps') ? format.fps : undefined,
     segment_info: await getSegmentInfo(format, url_transformer, actions, player, cpn, shared_post_live_dvr_info, is_sabr)
   };
