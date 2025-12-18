@@ -118,6 +118,7 @@ async function DashManifest({
             lang={set.language}
             codecs={set.codecs}
             audioSamplingRate={set.audio_sample_rate}
+            group="2"
             contentType="audio"
           >
             {
@@ -174,8 +175,8 @@ async function DashManifest({
             id={index + audio_sets.length}
             mimeType={set.mime_type}
             startWithSAP="1"
-            subsegmentAlignment="true"
             codecs={set.codecs}
+            group="1"
             maxPlayoutRate="1"
             frameRate={set.fps}
             contentType="video"
