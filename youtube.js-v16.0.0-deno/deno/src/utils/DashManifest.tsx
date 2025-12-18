@@ -174,6 +174,7 @@ async function DashManifest({
             id={index + audio_sets.length}
             mimeType={set.mime_type}
             startWithSAP="1"
+            subsegmentAlignment="true"
             codecs={set.codecs}
             maxPlayoutRate="1"
             frameRate={set.fps}
