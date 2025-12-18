@@ -601,7 +601,7 @@ async function getVideoSet(
   const set: VideoSet = {
     mime_type: first_format.mime_type.split(';')[0],
     color_info,
-    codecs: hoistCodecsIfPossible(formats, hoisted),
+    codecs: undefined,
     fps: hoistNumberAttributeIfPossible(formats, 'fps', hoisted),
     drm_families: first_format.drm_families,
     drm_track_type: first_format.drm_track_type,
