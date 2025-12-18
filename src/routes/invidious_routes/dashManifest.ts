@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { FormatUtils } from "youtubei.js";
-import { JSDOM } from "jsdom";
 import {
     youtubePlayerParsing,
     youtubeVideoInfo,
@@ -10,65 +9,6 @@ import { HTTPException } from "hono/http-exception";
 import { encryptQuery } from "../../lib/helpers/encryptQuery.ts";
 import { validateVideoId } from "../../lib/helpers/validateVideoId.ts";
 import { TOKEN_MINTER_NOT_READY_MESSAGE } from "../../constants.ts";
-
-// Fix DASH manifest for Chromium compatibility.
-// 1. Remove problematic SupplementalProperty elements.
-// 2. Split video AdaptationSets by codec family to prevent MEDIA_ERR_DECODE.
-function fixDashManifest(xml: string): string {
-    const dom = new JSDOM(xml, { contentType: "application/xml" });
-    const doc = dom.window.document;
-
-    // Remove SupplementalProperty elements that cause issues in some players
-    for (const el of doc.querySelectorAll('SupplementalProperty[schemeIdUri^="urn:mpeg:mpegB:"]')) {
-        el.remove();
-    }
-
-    const period = doc.querySelector("Period");
-    if (period) {
-        let nextId = doc.querySelectorAll("AdaptationSet").length;
-
-        for (
-            const set of period.querySelectorAll(
-                'AdaptationSet[contentType="video"]',
-            )
-        ) {
-            const reps = [...set.querySelectorAll("Representation")];
-            const byCodec = Map.groupBy(
-                reps,
-                (r) => r.getAttribute("codecs")?.split(".")[0] ?? "",
-            );
-
-            if (byCodec.size <= 1) continue;
-
-            let isFirst = true;
-            for (const [, groupReps] of byCodec) {
-                const currentSet = isFirst
-                    ? set
-                    : set.cloneNode(true);
-                if (!isFirst) {
-                    currentSet.setAttribute("id", String(nextId++));
-                    period.insertBefore(currentSet, set.nextSibling);
-                }
-
-                currentSet.setAttribute(
-                    "codecs",
-                    groupReps[0].getAttribute("codecs") ?? "",
-                );
-                const keepIds = new Set(
-                    groupReps.map((r) => r.getAttribute("id")),
-                );
-
-                for (const r of currentSet.querySelectorAll("Representation")) {
-                    if (!keepIds.has(r.getAttribute("id"))) r.remove();
-                }
-
-                isFirst = false;
-            }
-        }
-    }
-
-    return dom.serialize();
-}
 
 const dashManifest = new Hono();
 
@@ -183,7 +123,7 @@ dashManifest.get("/:videoId", async (c) => {
             captions,
             undefined,
         );
-        return c.body(fixDashManifest(dashFile));
+        return c.body(dashFile);
     }
 });
 
