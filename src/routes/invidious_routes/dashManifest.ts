@@ -71,11 +71,6 @@ dashManifest.get("/:videoId", async (c) => {
     c.header("content-type", "application/dash+xml");
 
     if (videoInfo.streaming_data) {
-        // video.js only supports MP4 not WEBM
-        videoInfo.streaming_data.adaptive_formats = videoInfo
-            .streaming_data.adaptive_formats
-            .filter((i) => i.mime_type.includes("mp4"));
-
         // Filter to one codec per height to prevent MEDIA_ERR_DECODE
         videoInfo.streaming_data.adaptive_formats = filterAdaptiveFormats(
             videoInfo.streaming_data.adaptive_formats,
