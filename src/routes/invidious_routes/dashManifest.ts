@@ -72,9 +72,9 @@ dashManifest.get("/:videoId", async (c) => {
 
     if (videoInfo.streaming_data) {
         // Filter to one codec per height to prevent MEDIA_ERR_DECODE
-        videoInfo.streaming_data.adaptive_formats = filterAdaptiveFormats(
-            videoInfo.streaming_data.adaptive_formats,
-        );
+        // videoInfo.streaming_data.adaptive_formats = filterAdaptiveFormats(
+        //     videoInfo.streaming_data.adaptive_formats,
+        // );
 
         const player_response = videoInfo.page[0];
         // TODO: fix include storyboards in DASH manifest file
@@ -127,7 +127,7 @@ dashManifest.get("/:videoId", async (c) => {
             captions,
             undefined,
         );
-        return c.body(fixDashManifest(dashFile));
+        return c.body(dashFile);
     }
 });
 
